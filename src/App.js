@@ -12,31 +12,40 @@ const HORIZONS = ["Near-term", "Medium-term", "Structural"];
 const buildPrompt = (name, ticker) => `
 You are a senior equity analyst at a European quality-growth fund (benchmark: MSCI Europe).
 Today's date is ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}.
-Your task: assess "${name}" (${ticker || "n/a"}) on its structural exposure to AI.
+Your task: assess "${name}" (${ticker || "n/a"}) on its structural AI exposure.
 
-IMPORTANT: Use the most recent information available to you. Prioritise news, earnings results, management guidance, and analyst commentary from the last 3 months over older data. If you are aware of developments that post-date 2024 — new product launches, profit warnings, contract wins, capital allocation changes, competitive shifts — cite those specifically with approximate dates. Do not default to 2024 figures if more recent data exists.
+CRITICAL CALIBRATION — READ BEFORE SCORING:
+Most MSCI Europe companies score 2-3 on both axes. Reserve 4-5 scores strictly for cases where AI is the dominant narrative in analyst consensus RIGHT NOW. If the main AI story is internal efficiency or cost savings, that is a 2 on offense — not a 3 or 4. A pharma company using AI for drug discovery is NOT a clear AI winner unless AI is cited by the majority of sell-side analysts as the primary revenue driver. An industrial company with AI-optimised factories is NOT a winner — that is table stakes. Be skeptical. Anchor to what the consensus actually says today, not to theoretical possibilities.
 
-Work through each of the four mechanisms privately, then return your conclusion.
+OFFENSE scoring guide (be strict):
+- 5: AI is THE primary growth driver right now, cited by consensus as the dominant thesis. Pure-play or near-pure-play exposure. Examples: ASML, semiconductor equipment.
+- 4: AI creates meaningful new revenue streams or deepens moat measurably. Consensus explicitly calls it out as a top-3 driver. Examples: enterprise software with proven AI monetisation.
+- 3: AI provides a real but secondary tailwind. Some analysts mention it but it is not the core thesis.
+- 2: AI helps operationally (efficiency, cost-out) but does not move the revenue or moat needle. This is where most industrials, consumer, and healthcare names belong.
+- 1: AI is irrelevant or immaterial to the investment case.
 
-MECHANISM REASONING (think through each before scoring):
-1. REVENUE / TAM — Does AI structurally expand this company's addressable market, create new product lines, or accelerate pricing power? Or does it cannibalize existing revenue streams or enable cheaper substitutes?
-2. MARGIN — Is AI a net cost-out story for this business (automation, efficiency), or will competitive dynamics force margin give-back? Who captures the value — the company or its customers?
-3. MOAT — Does this company have proprietary data, distribution, or workflow embedding that becomes MORE defensible with AI? Or does AI commoditise its core offering and lower barriers to entry?
-4. CAPEX / REINVESTMENT — Is the reinvestment burden to stay competitive manageable, or does AI require heavy capex that weighs on ROIC? Is it a net capex beneficiary (selling to the builders) or a net spender?
+THREAT scoring guide (be strict):
+- 5: AI directly substitutes the core product or destroys the moat. Existential risk within 3-5 years.
+- 4: AI structurally impairs the business model or pricing power. Consensus increasingly worried.
+- 3: Credible medium-term threat to a revenue stream but not the whole business.
+- 2: Some exposure but strong mitigants (switching costs, regulation, brand, data).
+- 1: Well insulated. No credible AI disruption path.
 
-After reasoning privately, return ONLY this JSON — no markdown, no preamble:
+IMPORTANT: Use the most recent information available. Prioritise earnings, guidance, and analyst commentary from the last 3 months. Cite specific recent facts with approximate dates.
+
+Work through each of the four mechanisms privately before scoring:
+1. REVENUE / TAM — real new revenue from AI, or just efficiency?
+2. MARGIN — who captures the value, the company or its customers/competitors?
+3. MOAT — does AI deepen or erode the competitive advantage?
+4. CAPEX / REINVESTMENT — net beneficiary or net spender?
+
+Return ONLY this JSON — no markdown, no preamble:
 {
   "off": <integer 1-5>,
   "thr": <integer 1-5>,
   "horizon": "<Near-term|Medium-term|Structural>",
-  "paragraph": "<One analytical paragraph, 60-90 words, explaining the net winner/loser verdict. Be specific: name the dominant mechanism, cite at least 2 concrete data points or facts (revenue figures, market share, margins, customer concentration, product names, dates). Write like a CFA charterholder, not a journalist. No hedging phrases like 'it remains to be seen'.>"
+  "paragraph": "<60-90 words. State the verdict clearly in the first sentence. Name the dominant mechanism. Cite 2+ specific recent facts (figures, product names, dates). Reference what sell-side consensus says. Write like a CFA charterholder. No hedging, no 'could potentially', no 'remains to be seen'.>"
 }
-
-Scoring guide:
-- off 5 = transformational AI tailwind (new TAM, structural moat deepening, major cost-out)
-- off 1 = AI is irrelevant or negligible for the upside
-- thr 5 = existential disruption risk (core product substituted, moat destroyed, margin structurally impaired)
-- thr 1 = well insulated, AI poses no credible threat to the business model
 `.trim();
 
 // ─── Seed data ────────────────────────────────────────────────────────────────
