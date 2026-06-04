@@ -84,17 +84,29 @@ function bmkWeight(h, benchmark) {
 }
 
 function parseCSV(text) {
-  const rows = text.trim().split(/\r?\n/).map(l => l.split(",").map(c => c.trim()));
-  const hdr  = rows[0].map(c => c.toLowerCase());
-  const fi   = keys => hdr.findIndex(c => keys.some(k => c.includes(k)));
-  const ni   = fi(["name","company","holding"]);
-  const ti   = fi(["ticker","isin","code","bbg"]);
-  const wi   = fi(["weight","wt","%","pos"]);
-  return rows.slice(1).filter(r => r[ni]).map(r => ({
-    name:   (r[ni] || "").trim(),
-    ticker: ti >= 0 ? (r[ti] || "").trim() : "",
-    weight: parseFloat(wi >= 0 ? r[wi] : 0) || 0,
-  }));
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  const sep = lines[0].includes(";") ? ";" : ",";
+  const rows = lines.map(l => l.split(sep).map(c => c.trim()));
+  const hdr = rows[0].map(c => c.toLowerCase());
+  const hasHeader = isNaN(parseFloat(hdr[hdr.length - 1]));
+  const dataRows = hasHeader ? rows.slice(1) : rows;
+  if (hasHeader) {
+    const fi = keys => hdr.findIndex(c => keys.some(k => c.includes(k)));
+    const ni = fi(["name","company","holding"]);
+    const ti = fi(["ticker","isin","code","bbg"]);
+    const wi = fi(["weight","wt","%","pos"]);
+    return dataRows.filter(r => r[ni]).map(r => ({
+      name:   (r[ni] || "").trim(),
+      ticker: ti >= 0 ? (r[ti] || "").trim() : "",
+      weight: parseFloat(wi >= 0 ? r[wi] : 0) || 0,
+    }));
+  } else {
+    return dataRows.filter(r => r[0]).map(r => ({
+      name:   (r[0] || "").trim(),
+      ticker: r.length >= 3 ? (r[1] || "").trim() : "",
+      weight: parseFloat(r[r.length - 1]) || 0,
+    }));
+  }
 }
 
 // ─── App ──────────────────────────────────────────────────────────────────────
