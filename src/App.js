@@ -1,10 +1,39 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 
 const GREEN = "#19A49E";
 const PURPLE = "#7B378B";
 const GREY = "#575757";
 const INK = "#1a1a1a";
 const HORIZONS = ["Near-term", "Medium-term", "Structural"];
+// ─── Supabase config ────────────────────────────────────────────────────────
+const SB_URL = process.env.REACT_APP_SUPABASE_URL || "";
+const SB_KEY = process.env.REACT_APP_SUPABASE_KEY || "";
+
+async function sbLoad(table) {
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.1&select=data`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` },
+    });
+    const rows = await res.json();
+    return rows?.[0]?.data ?? null;
+  } catch { return null; }
+}
+
+async function sbSave(table, data) {
+  if (!SB_URL || !SB_KEY) return;
+  try {
+    await fetch(`${SB_URL}/rest/v1/${table}`, {
+      method: "POST",
+      headers: {
+        apikey: SB_KEY,
+        Authorization: `Bearer ${SB_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates",
+      },
+      body: JSON.stringify({ id: 1, data, updated_at: new Date().toISOString() }),
+    });
+  } catch {}
+}
 
 // ─── Prompt ───────────────────────────────────────────────────────────────────
 // Chain-of-thought internally: reason through all four mechanisms, then
@@ -135,6 +164,22 @@ export default function App() {
 
   const updH = (i, f, v) => setHoldings(hs => hs.map((h, j) => j === i ? { ...h, [f]: v } : h));
   const updB = (i, f, v) => setBenchmark(bs => bs.map((b, j) => j === i ? { ...b, [f]: v } : b));
+
+  // ─── Sync Supabase : chargement au démarrage ──────────────────────────────
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    (async () => {
+      const pf  = await sbLoad("portfolio");
+      const bmk = await sbLoad("benchmark");
+      if (pf)  setHoldings(pf);
+      if (bmk) setBenchmark(bmk);
+      setLoaded(true);
+    })();
+  }, []);
+
+  // ─── Sauvegarde auto à chaque changement (après le chargement initial) ─────
+  useEffect(() => { if (loaded) sbSave("portfolio", holdings); }, [holdings, loaded]);
+  useEffect(() => { if (loaded) sbSave("benchmark", benchmark); }, [benchmark, loaded]);
 
   // ─── Aggregates ─────────────────────────────────────────────────────────────
   const agg = useMemo(() => {
