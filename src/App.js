@@ -325,10 +325,10 @@ export default function App() {
             <rect x={PAD} y={PAD}   width={W/2-PAD} height={H/2-PAD} fill={GREY}     opacity={.05}/>
             <line x1={PAD} y1={H/2} x2={W-PAD} y2={H/2} stroke="#ddd"/>
             <line x1={W/2} y1={PAD} x2={W/2} y2={H-PAD} stroke="#ddd"/>
-            <text x={W-PAD} y={PAD-10} fontSize="9" fill={GREEN}    textAnchor="end"    fontFamily="Courier New">CLEAR WINNER</text>
-            <text x={W-PAD} y={H-PAD+18} fontSize="9" fill={PURPLE} textAnchor="end"    fontFamily="Courier New">CONTESTED</text>
-            <text x={PAD}   y={H-PAD+18} fontSize="9" fill="#C0392B" fontFamily="Courier New">DISRUPTED</text>
-            <text x={PAD}   y={PAD-10}   fontSize="9" fill={GREY}    fontFamily="Courier New">INSULATED</text>
+            <text x={W-PAD} y={PAD-10}   fontSize="9" fill={PURPLE}  textAnchor="end" fontFamily="Courier New">CONTESTED</text>
+            <text x={W-PAD} y={H-PAD+18} fontSize="9" fill={GREEN}   textAnchor="end" fontFamily="Courier New">CLEAR WINNER</text>
+            <text x={PAD}   y={H-PAD+18} fontSize="9" fill={GREY}                     fontFamily="Courier New">INSULATED</text>
+            <text x={PAD}   y={PAD-10}   fontSize="9" fill="#C0392B"                  fontFamily="Courier New">DISRUPTED</text>
             <text x={W/2}   y={H-4}      fontSize="9" fill={INK}     textAnchor="middle" fontFamily="Courier New">OFFENSE →</text>
             <text x={11}    y={H/2}      fontSize="9" fill={INK}     textAnchor="middle" fontFamily="Courier New" transform={`rotate(-90 11 ${H/2})`}>THREAT →</text>
             {holdings.filter(h => h.off && h.thr).map((h, i) => {
