@@ -148,7 +148,7 @@ export default function App() {
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
         body: JSON.stringify({
           model: "gpt-5.4",
-          max_tokens: 600,
+          max_completion_tokens: 800,
           temperature: 0.3,
           messages: [{ role: "user", content: buildPrompt(h.name, h.ticker) }],
         }),
