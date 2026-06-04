@@ -11,7 +11,10 @@ const HORIZONS = ["Near-term", "Medium-term", "Structural"];
 // surface final scores + one analytical paragraph with data where possible.
 const buildPrompt = (name, ticker) => `
 You are a senior equity analyst at a European quality-growth fund (benchmark: MSCI Europe).
+Today's date is ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}.
 Your task: assess "${name}" (${ticker || "n/a"}) on its structural exposure to AI.
+
+IMPORTANT: Use the most recent information available to you. Prioritise news, earnings results, management guidance, and analyst commentary from the last 3 months over older data. If you are aware of developments that post-date 2024 — new product launches, profit warnings, contract wins, capital allocation changes, competitive shifts — cite those specifically with approximate dates. Do not default to 2024 figures if more recent data exists.
 
 Work through each of the four mechanisms privately, then return your conclusion.
 
@@ -26,7 +29,7 @@ After reasoning privately, return ONLY this JSON — no markdown, no preamble:
   "off": <integer 1-5>,
   "thr": <integer 1-5>,
   "horizon": "<Near-term|Medium-term|Structural>",
-  "paragraph": "<One analytical paragraph, 60-90 words, explaining the net winner/loser verdict. Be specific: name the dominant mechanism, cite at least 2 concrete data points or facts (revenue figures, market share, margins, customer concentration, product names). Write like a CFA charterholder, not a journalist. No hedging phrases like 'it remains to be seen'.>"
+  "paragraph": "<One analytical paragraph, 60-90 words, explaining the net winner/loser verdict. Be specific: name the dominant mechanism, cite at least 2 concrete data points or facts (revenue figures, market share, margins, customer concentration, product names, dates). Write like a CFA charterholder, not a journalist. No hedging phrases like 'it remains to be seen'.>"
 }
 
 Scoring guide:
